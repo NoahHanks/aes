@@ -1,0 +1,62 @@
+CAPI=2:
+
+name : tiny-aes:crypto:aes:0
+
+filesets:
+  rtl:
+    files:
+      - src/rtl/aes_128.v
+      - src/rtl/aes_192.v
+      - src/rtl/aes_256.v
+      - src/rtl/round.v
+      - src/rtl/table.v
+    file_type : verilogSource
+
+  tb:
+    files:
+      - src/tb/test_aes_128.v
+      - src/tb/test_aes_192.v
+      - src/tb/test_aes_256.v
+      - src/tb/test_endian.v
+      - src/tb/test_table_lookup.v
+    file_type : verilogSource
+
+  openlane: {files : [data/sky130.tcl : {file_type : tclSource}]}
+
+targets:
+  default:
+    filesets: [rtl]
+
+  lint:
+    default_tool : verilator
+    filesets : [rtl]
+    tools:
+      verilator:
+        mode : lint-only
+    toplevel : aes
+
+  sky130:
+    default_tool: openlane
+    filesets: [rtl, openlane]
+    toplevel: aes
+
+  test_aes_128: &tb
+    default_tool: icarus
+    filesets: [rtl, tb]
+    toplevel : test_aes_128
+
+  test_aes_192:
+    <<: *tb
+    toplevel : test_aes_192
+
+  test_aes_256:
+    <<: *tb
+    toplevel : test_aes_256
+
+  test_endian:
+    <<: *tb
+    toplevel : test_endian
+
+  test_table_lookup:
+    <<: *tb
+    toplevel : test_table_lookup
